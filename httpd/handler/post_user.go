@@ -13,6 +13,12 @@ type User struct {
 	Pass string `json:"pass"`
 }
 
+var userGlobal = User{
+	Name: "Autul",
+	Age:  23,
+	Pass: "abcd",
+}
+
 func PostUser(c *gin.Context) {
 	user := User{}
 
@@ -22,7 +28,7 @@ func PostUser(c *gin.Context) {
 
 	fmt.Println(user)
 
-	if user.Name != "" && user.Age != 0 && user.Pass != "" {
+	if user.Name != "" && user.Age != 0 && user.Pass !="" && user.Pass==userGlobal.Pass  {
 		c.JSON(http.StatusAccepted, gin.H{"success": true})
 		return
 	}

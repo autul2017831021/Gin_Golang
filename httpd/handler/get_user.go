@@ -8,11 +8,7 @@ import (
 
 func GetUser(c *gin.Context) {
 
-	userInfo := User{
-		Name: "Autul",
-		Age:  23,
-		Pass: "abcd",
-	}
+	userInfo := userGlobal
 
 	c.JSON(http.StatusOK, userInfo)
 }
