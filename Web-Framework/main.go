@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"web-framework/auth"
 	"web-framework/configs"
 	"web-framework/controllers"
 
@@ -15,7 +16,9 @@ func main() {
 
 	router := gin.Default()
 
-	controllers.NewUserController().Handler(router)
+	appconfig := configs.LoadConfig()
+	auth := auth.NewAuth(appconfig)
+	controllers.NewUserController(auth).Handler(router)
 
 	router.Run(fmt.Sprintf(":%d", config.Port))
 }
