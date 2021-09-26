@@ -20,7 +20,7 @@ func NewUserController(auth auth.IAtuh) *UserController {
 }
 
 func (h *UserController) Handler(r *gin.Engine) {
-	router := r.Group("/users")
+	router := r.Group("/api/Platform/Command")
 	{
 		authRoute := router.Group("")
 		{

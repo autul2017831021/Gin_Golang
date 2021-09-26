@@ -29,18 +29,34 @@ func NewAuth(appconfig *configs.AppConfig) IAtuh {
 }
 
 type Claims struct {
-	Email string `json:"email"`
+	Given_Name         string `"json": "given_name"`
+	Family_Name        string `"json": "family_name"`
+	Email              string `json:"email"`
+	Company_Id         string `json: "company_id"`
+	Product_Codes      string `json: "product_codes"`
+	Is_Check_Point_Use bool   `json : "is_check_point_use"`
 	jwt.StandardClaims
 }
 
 func (h *Auth) GenerateToken(user *domains.User) (string, error) {
-	// jwt token
-	expirationTime := time.Now().Add(time.Minute * 5)
+	subject := user.Email
+	notBefore := time.Now().Add(time.Second * 10)
+	expirationTime := notBefore.Add(time.Minute * 10)
+	issuer := "localhost"
 
 	claims := &Claims{
-		Email: user.Email,
+		Given_Name:         user.Given_Name,
+		Family_Name:        user.Family_Name,
+		Email:              user.Email,
+		Company_Id:         user.Company_Id,
+		Product_Codes:      user.Product_Codes,
+		Is_Check_Point_Use: user.Is_Check_Point_Use,
 		StandardClaims: jwt.StandardClaims{
+			Subject: subject,
+			// Id: ,
+			NotBefore: notBefore.Unix(),
 			ExpiresAt: expirationTime.Unix(),
+			Issuer:    issuer,
 		},
 	}
 	fmt.Println(claims)
@@ -66,7 +82,6 @@ func (h *Auth) Authenticate() gin.HandlerFunc {
 
 		if c.Request.Header["Authorization"] != nil {
 			tokenString := extractToken()
-			// fmt.Println(tokenString)
 			token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, errors.New("invalid authorized token")
@@ -74,15 +89,14 @@ func (h *Auth) Authenticate() gin.HandlerFunc {
 				return []byte(h.Secret), nil
 			})
 
-			// fmt.Println("hi ", err)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				c.Abort()
 				return
 			}
-			// fmt.Println("here")
 			if token.Valid {
 				claims := token.Claims.(jwt.MapClaims)
+				//fmt.Println(claims)
 				c.Set("email", claims["email"])
 				c.Next()
 			}
